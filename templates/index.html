@@ -627,6 +627,14 @@
         gap: 1.5rem;
       }
     }
+    .app-footer {
+  margin-top: 40px;
+  padding: 16px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #6b7280;
+  border-top: 1px solid #e5e7eb;
+}
   </style>
 </head>
 
@@ -643,7 +651,8 @@
       <nav>
         <ul class="nav-menu">
           <li class="nav-item">
-            <a class="nav-link active" data-section="watermark">
+            <a class="nav-link {% if active_section == 'watermark' %}active{% endif %}"
+   data-section="watermark">
               <span class="nav-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -655,7 +664,8 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-section="checker">
+            <a class="nav-link {% if active_section == 'checker' %}active{% endif %}"
+   data-section="checker">
               <span class="nav-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="11" cy="11" r="8"></circle>
@@ -677,7 +687,8 @@
     <main class="main-content">
       
       <!-- Watermark Section -->
-      <section id="watermark-section" class="section active">
+      <section id="watermark-section"
+         class="section {% if active_section == 'watermark' %}active{% endif %}">
         <div class="page-header">
           <div class="status-badge">
             <span class="status-dot"></span>
@@ -742,7 +753,8 @@
       </section>
 
       <!-- Checker Section -->
-      <section id="checker-section" class="section">
+      <section id="checker-section"
+         class="section {% if active_section == 'checker' %}active{% endif %}">
         <div class="page-header">
           <div class="status-badge">
             <span class="status-dot"></span>
@@ -756,7 +768,7 @@
           <div class="form-grid">
             <!-- Form Section -->
             <div class="form-section">
-              <form id="checker-form" action="/index" method="POST" enctype="multipart/form-data">
+              <form id="checker-form" action="/trace-image" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                   <label for="checker_image">Select Image to Analyze</label>
                   <input
@@ -886,5 +898,8 @@
       }
     });
   </script>
+  <footer class="app-footer">
+  © forex-911 · Invisible Watermarking System
+</footer>
 </body>
 </html>

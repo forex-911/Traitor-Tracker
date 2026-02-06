@@ -1,16 +1,15 @@
 import cv2
-import numpy as np
+import os
 
 
-def crop_attack(image, crop_ratio=0.7):
-    """
-    Crop the center of the image
-    crop_ratio: 0.7 keeps 70% of image
-    """
+def run(image_path: str) -> str:
+    image = cv2.imread(image_path)
     h, w = image.shape[:2]
-    ch, cw = int(h * crop_ratio), int(w * crop_ratio)
 
-    y1 = (h - ch) // 2
-    x1 = (w - cw) // 2
+    # Crop 10% from all sides
+    cropped = image[int(0.1 * h):int(0.9 * h),
+                    int(0.1 * w):int(0.9 * w)]
 
-    return image[y1:y1 + ch, x1:x1 + cw]
+    out_path = image_path.replace(".", "_crop.")
+    cv2.imwrite(out_path, cropped)
+    return out_path

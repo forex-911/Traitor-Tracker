@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attack Evaluation – Traitor-Tracer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --accent: #111827;
+      --accent-light: #374151;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --success: #059669;
+      --success-bg: #d1fae5;
+      --success-border: #10b981;
+      --error: #dc2626;
+      --error-bg: #fee2e2;
+      --error-border: #ef4444;
+      --warning: #f59e0b;
+      --warning-bg: #fef3c7;
+      --info-bg: #f0f9ff;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    /* Header */
+    .header {
+      margin-bottom: 3rem;
+    }
+    
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+    }
+    
+    .back-link:hover {
+      color: var(--accent);
+      gap: 0.75rem;
+    }
+    
+    .back-link svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.875rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--warning);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 700px;
+      line-height: 1.6;
+    }
+    
+    /* Card */
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      transition: var(--transition);
+    }
+    
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+    
+    .card-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+    
+    /* Form */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+    
+    label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+    
+    .input-hint {
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+      margin-top: -0.25rem;
+    }
+    
+    input[type="file"] {
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    input[type="file"]:hover {
+      border-color: var(--accent-light);
+      background: var(--bg-secondary);
+    }
+    
+    input[type="file"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.05);
+    }
+    
+    input[type="file"]::file-selector-button {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-right: 0.875rem;
+    }
+    
+    input[type="file"]::file-selector-button:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    
+    select {
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: var(--transition);
+      outline: none;
+    }
+    
+    select:hover {
+      border-color: var(--accent-light);
+      background: var(--bg-secondary);
+    }
+    
+    select:focus {
+      border-color: var(--accent);
+      background: var(--bg-secondary);
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.05);
+    }
+    
+    button {
+      padding: 0.9375rem 1.75rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    
+    button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    button:hover {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    button:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    /* Results */
+    .result {
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      animation: slideIn 0.4s ease forwards;
+    }
+    
+    .result.success {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+    }
+    
+    .result.error {
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+    }
+    
+    .result h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.375rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+    
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    
+    table th,
+    table td {
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    table th {
+      background: var(--bg-primary);
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+    
+    table td {
+      color: var(--text-secondary);
+    }
+    
+    table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    table tr:hover td {
+      background: var(--bg-primary);
+    }
+    
+    /* Single result table - 2 column layout */
+    .single-result-table th {
+      width: 200px;
+      text-align: right;
+      padding-right: 1.5rem;
+    }
+    
+    .single-result-table td {
+      text-align: left;
+    }
+    
+    /* Multi-result table - standard layout */
+    .multi-result-table th,
+    .multi-result-table td {
+      text-align: center;
+    }
+    
+    .multi-result-table th:first-child,
+    .multi-result-table td:first-child {
+      text-align: left;
+      padding-left: 1.5rem;
+    }
+    
+    code {
+      background: var(--bg-primary);
+      padding: 0.25rem 0.625rem;
+      border-radius: 4px;
+      font-size: 0.8125rem;
+      font-family: 'Monaco', 'Courier New', monospace;
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+    
+    .status-badge-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 100px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    
+    .status-ok {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+    
+    .status-fail {
+      background: var(--error-bg);
+      color: var(--error);
+      border: 1px solid var(--error-border);
+    }
+    
+    .status-badge-inline::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    
+    .status-ok::before {
+      background: var(--success);
+    }
+    
+    .status-fail::before {
+      background: var(--error);
+    }
+    
+    /* Error message */
+    .error-message {
+      display: flex;
+      align-items: start;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      border-radius: 8px;
+      color: var(--error);
+      font-size: 0.9375rem;
+      line-height: 1.5;
+    }
+    
+    .error-message svg {
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+    }
+    
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 2rem 1.5rem;
+      }
+      
+      .card {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      table th,
+      table td {
+        padding: 0.75rem;
+        font-size: 0.8125rem;
+      }
+      
+      .single-result-table th {
+        width: 150px;
+        padding-right: 1rem;
+      }
+      
+      .multi-result-table {
+        font-size: 0.75rem;
+      }
+    }
+    .app-footer {
+  margin-top: 40px;
+  padding: 16px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #6b7280;
+  border-top: 1px solid #e5e7eb;
+}
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    
+    <!-- Header -->
+    <div class="header">
+      <a class="back-link" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Dashboard
+      </a>
+      
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        Robustness Testing
+      </div>
+      
+      <h1>Attack Evaluation</h1>
+      <p class="subtitle">
+        This module evaluates watermark robustness under different signal-processing
+        and geometric attacks. Even when detection fails, the extracted identifier
+        is shown for analysis.
+      </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card">
+      <h2 class="card-title">Configure Attack Test</h2>
+      
+      <form action="/attack-run" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="image">Watermarked Image</label>
+          <input type="file" id="image" name="image" accept="image/*" required>
+          <span class="input-hint">Upload the image with embedded watermark</span>
+        </div>
+
+        <div class="form-group">
+          <label for="attack_type">Attack Type</label>
+          <select id="attack_type" name="attack_type" required>
+            <option value="">Select an attack to simulate</option>
+            <option value="crop">Cropping Attack</option>
+            <option value="resize">Resizing Attack</option>
+            <option value="noise">Noise Injection Attack</option>
+            <option value="compress">JPEG Compression Attack</option>
+            <option value="all">Run All Attacks</option>
+          </select>
+          <span class="input-hint">Choose a single attack or test against all</span>
+        </div>
+
+        <button type="submit">Run Attack & Evaluate</button>
+      </form>
+    </div>
+
+    <!-- SINGLE ATTACK RESULT -->
+    {% if result %}
+    <div class="result success">
+      <h3>Attack Evaluation Result</h3>
+      <table class="single-result-table">
+        <tr>
+          <th>Attack Type</th>
+          <td><strong>{{ result.attack }}</strong></td>
+        </tr>
+        <tr>
+          <th>Extracted Identifier</th>
+          <td><code>{{ result.extracted }}</code></td>
+        </tr>
+        <tr>
+          <th>Similarity Score</th>
+          <td><strong>{{ result.score }}</strong></td>
+        </tr>
+        <tr>
+          <th>Detection Status</th>
+          <td>
+            {% if result.success %}
+              <span class="status-badge-inline status-ok">Detected</span>
+            {% else %}
+              <span class="status-badge-inline status-fail">Failed</span>
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+    </div>
+    {% endif %}
+
+    <!-- ALL ATTACK RESULTS -->
+    {% if all_results %}
+    <div class="result success">
+      <h3>Robustness Evaluation – All Attacks</h3>
+      <table class="multi-result-table">
+        <thead>
+          <tr>
+            <th>Attack Type</th>
+            <th>Extracted Identifier</th>
+            <th>Similarity Score</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in all_results %}
+          <tr>
+            <td><strong>{{ r.attack }}</strong></td>
+            <td><code>{{ r.extracted }}</code></td>
+            <td>{{ r.score }}</td>
+            <td>
+              {% if r.success %}
+                <span class="status-badge-inline status-ok">Detected</span>
+              {% else %}
+                <span class="status-badge-inline status-fail">Failed</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    <!-- ERROR -->
+    {% if error %}
+    <div class="result error">
+      <div class="error-message">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <div>
+          <strong>Error:</strong> {{ error }}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+  <footer class="app-footer">
+  © forex-911 · Invisible Watermarking System
+</footer>
+</body>
+</html>
