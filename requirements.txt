@@ -1,23 +1,25 @@
-# Core
+# Core numerical & image processing
 numpy
 opencv-python
+
+# Signal / frequency domain processing
 scipy
 pywavelets
 
-# Image quality metrics
+# Image quality metrics & analysis
 scikit-image
 
-# Security
+# Security & hashing
 cryptography
 
-# Web API
+# Web framework
 flask
 
-# Testing
+# Testing framework
 pytest
 
-# Optional (recommended)
+# Environment configuration (recommended)
 python-dotenv
 
-#for online database connections
+# Online database connection (PostgreSQL / Supabase)
 psycopg2-binary
