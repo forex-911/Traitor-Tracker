@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traitor-Tracer Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --accent: #111827;
+      --accent-light: #374151;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --success: #059669;
+      --success-bg: #d1fae5;
+      --error: #dc2626;
+      --error-bg: #fee2e2;
+      --sidebar-width: 260px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: 0;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1.375rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .logo-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      margin-top: 0.25rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 1.5rem 0;
+      flex: 1;
+    }
+
+    .nav-item {
+      margin-bottom: 0.25rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      padding: 0.875rem 1.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: var(--transition);
+      border-left: 2px solid transparent;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2px;
+      height: 0;
+      background: var(--accent);
+      transition: height 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      background: var(--bg-primary);
+    }
+
+    .nav-link:hover::before {
+      height: 60%;
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      background: var(--bg-primary);
+      font-weight: 600;
+    }
+
+    .nav-link.active::before {
+      height: 100%;
+    }
+
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-light);
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      text-align: center;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 2.5rem 3rem;
+      max-width: 1400px;
+    }
+
+    /* Header */
+    .page-header {
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeInUp 0.6s ease forwards 0.1s;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.875rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .page-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    .page-subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 650px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* Section */
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    /* Content Card */
+    .content-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      transition: var(--transition);
+    }
+
+    .content-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Form Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .form-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Form Styles */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .input-hint {
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+      margin-top: -0.25rem;
+    }
+
+    input[type="text"] {
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      background: var(--bg-secondary);
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.05);
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    /* Custom File Input */
+    .file-input-wrapper {
+      position: relative;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    input[type="file"]:hover {
+      border-color: var(--accent-light);
+      background: var(--bg-secondary);
+    }
+
+    input[type="file"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.05);
+    }
+
+    input[type="file"]::file-selector-button {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-right: 0.875rem;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    /* Button */
+    button {
+      padding: 0.9375rem 1.75rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+    }
+
+    button:hover {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    button:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Image Preview */
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+
+    .preview-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .preview-container {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      background: var(--bg-primary);
+      min-height: 450px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .preview-container.has-image {
+      border-style: solid;
+      border-color: var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .preview-placeholder {
+      text-align: center;
+      color: var(--text-tertiary);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .preview-placeholder svg {
+      width: 56px;
+      height: 56px;
+      opacity: 0.2;
+      stroke: currentColor;
+    }
+
+    .preview-placeholder p {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 500px;
+      display: none;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .preview-image.visible {
+      display: block;
+    }
+
+    /* Result Display */
+    .result {
+      margin-top: 2rem;
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      border-left: 3px solid;
+      animation: slideIn 0.4s ease forwards;
+    }
+
+    .result.success {
+      border-color: var(--success);
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .result.error {
+      border-color: var(--error);
+      background: var(--error-bg);
+      color: var(--error);
+    }
+
+    .result-title {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-size: 0.875rem;
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-label {
+      font-weight: 600;
+      color: inherit;
+    }
+
+    .result-value {
+      font-weight: 400;
+      color: var(--text-primary);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-container {
+        min-height: 350px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .sidebar-header {
+        padding: 1.5rem;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 1.5rem;
+      }
+
+      .nav-menu {
+        display: flex;
+        overflow-x: auto;
+        padding: 0.5rem 0;
+      }
+
+      .nav-item {
+        margin-bottom: 0;
+      }
+
+      .nav-link {
+        padding: 0.75rem 1.25rem;
+        white-space: nowrap;
+        border-left: none;
+        border-bottom: 2px solid transparent;
+      }
+
+      .nav-link::before {
+        display: none;
+      }
+
+      .nav-link.active {
+        border-bottom-color: var(--accent);
+      }
+
+      .sidebar-footer {
+        display: none;
+      }
+
+      .content-card {
+        padding: 1.5rem;
+      }
+
+      .page-title {
+        font-size: 1.75rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 1rem;
+      }
+
+      .content-card {
+        padding: 1.25rem;
+      }
+
+      .form-grid {
+        gap: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">traitor-tracer</div>
+        <div class="logo-subtitle">Security System</div>
+      </div>
+      
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a class="nav-link active" data-section="watermark">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </span>
+              Embed Watermark
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-section="checker">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </span>
+              Traitor Checker
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        Invisible Watermarking System
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- Watermark Section -->
+      <section id="watermark-section" class="section active">
+        <div class="page-header">
+          <div class="status-badge">
+            <span class="status-dot"></span>
+            Steganography
+          </div>
+          <h1 class="page-title">Embed watermark</h1>
+          <p class="page-subtitle">Upload an image and assign a user identifier to embed an invisible watermark for tracking and source identification.</p>
+        </div>
+
+        <div class="content-card">
+          <div class="form-grid">
+            <!-- Form Section -->
+            <div class="form-section">
+              <form id="watermark-form" action="/upload" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                  <label for="user_id">User Identifier</label>
+                  <input
+                    type="text"
+                    id="user_id"
+                    name="user_id"
+                    placeholder="e.g., USER_12345"
+                    required
+                  >
+                  <span class="input-hint">Unique identifier for watermark embedding</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="watermark_image">Select Image</label>
+                  <input
+                    type="file"
+                    id="watermark_image"
+                    name="image"
+                    accept="image/*"
+                    required
+                  >
+                  <span class="input-hint">Supported formats: JPG, PNG, WebP</span>
+                </div>
+
+                <button type="submit">
+                  <span>Upload & Watermark</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Image Preview Section -->
+            <div class="preview-section">
+              <span class="preview-label">Image Preview</span>
+              <div id="watermark-preview-container" class="preview-container">
+                <div class="preview-placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                  <p>No image selected</p>
+                </div>
+                <img id="watermark-preview-image" class="preview-image" alt="Preview">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Checker Section -->
+      <section id="checker-section" class="section">
+        <div class="page-header">
+          <div class="status-badge">
+            <span class="status-dot"></span>
+            Analysis
+          </div>
+          <h1 class="page-title">Traitor identification</h1>
+          <p class="page-subtitle">Upload a potentially leaked image to extract embedded watermark data and identify the source user who received this file.</p>
+        </div>
+
+        <div class="content-card">
+          <div class="form-grid">
+            <!-- Form Section -->
+            <div class="form-section">
+              <form id="checker-form" action="/index" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                  <label for="checker_image">Select Image to Analyze</label>
+                  <input
+                    type="file"
+                    id="checker_image"
+                    name="image"
+                    accept="image/*"
+                    required
+                  >
+                  <span class="input-hint">Upload the suspicious image file</span>
+                </div>
+
+                <button type="submit">
+                  <span>Analyze Image</span>
+                </button>
+              </form>
+
+              {% if result %}
+                <div class="result success">
+                  <div class="result-title">✓ Watermark Detected</div>
+                  <div class="result-item">
+                    <span class="result-label">Traitor User:</span>
+                    <span class="result-value">{{ result.user }}</span>
+                  </div>
+                  <div class="result-item">
+                    <span class="result-label">Watermarked At:</span>
+                    <span class="result-value">{{ result.time }}</span>
+                  </div>
+                  <div class="result-item">
+                    <span class="result-label">Confidence:</span>
+                    <span class="result-value">{{ result.score }}</span>
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if error %}
+                <div class="result error">
+                  <div class="result-title">✕ Error</div>
+                  <p style="margin-top: 0.5rem;">{{ error }}</p>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Image Preview Section -->
+            <div class="preview-section">
+              <span class="preview-label">Image Preview</span>
+              <div id="checker-preview-container" class="preview-container">
+                <div class="preview-placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                  <p>No image selected</p>
+                </div>
+                <img id="checker-preview-image" class="preview-image" alt="Preview">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Navigation functionality
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.section');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Remove active class from all links
+        navLinks.forEach(l => l.classList.remove('active'));
+        
+        // Add active class to clicked link
+        link.classList.add('active');
+        
+        // Hide all sections
+        sections.forEach(s => s.classList.remove('active'));
+        
+        // Show selected section
+        const sectionId = link.getAttribute('data-section') + '-section';
+        document.getElementById(sectionId).classList.add('active');
+      });
+    });
+
+    // Image preview for watermark form
+    const watermarkInput = document.getElementById('watermark_image');
+    const watermarkPreviewContainer = document.getElementById('watermark-preview-container');
+    const watermarkPreviewImage = document.getElementById('watermark-preview-image');
+
+    watermarkInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          watermarkPreviewImage.src = event.target.result;
+          watermarkPreviewImage.classList.add('visible');
+          watermarkPreviewContainer.classList.add('has-image');
+          const placeholder = watermarkPreviewContainer.querySelector('.preview-placeholder');
+          if (placeholder) placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Image preview for checker form
+    const checkerInput = document.getElementById('checker_image');
+    const checkerPreviewContainer = document.getElementById('checker-preview-container');
+    const checkerPreviewImage = document.getElementById('checker-preview-image');
+
+    checkerInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          checkerPreviewImage.src = event.target.result;
+          checkerPreviewImage.classList.add('visible');
+          checkerPreviewContainer.classList.add('has-image');
+          const placeholder = checkerPreviewContainer.querySelector('.preview-placeholder');
+          if (placeholder) placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+</body>
+</html>

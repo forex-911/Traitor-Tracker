@@ -1,0 +1,44 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtual Environment
+venv/
+.env/
+.env.*
+
+# =========================
+# Flask
+# =========================
+instance/
+.webassets-cache
+
+# =========================
+# Uploaded / Generated Files
+# =========================
+samples/
+uploads/
+*.jpg
+*.jpeg
+*.png
+*.webp
+
+# =========================
+# Database / Secrets
+# =========================
+security/keys.py
+database/*.env
+
+# =========================
+# IDE / OS
+# =========================
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

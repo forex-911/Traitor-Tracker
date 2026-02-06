@@ -1,0 +1,23 @@
+# Core
+numpy
+opencv-python
+scipy
+pywavelets
+
+# Image quality metrics
+scikit-image
+
+# Security
+cryptography
+
+# Web API
+flask
+
+# Testing
+pytest
+
+# Optional (recommended)
+python-dotenv
+
+#for online database connections
+psycopg2-binary

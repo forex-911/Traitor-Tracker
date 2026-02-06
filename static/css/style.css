@@ -1,0 +1,107 @@
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0f2027, #000);
+  color: #e5f2ff;
+  min-height: 100vh;
+}
+
+.bg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, #1e90ff22, transparent 40%),
+    radial-gradient(circle at 80% 80%, #00ffd522, transparent 40%);
+  z-index: -1;
+}
+
+.dashboard {
+  max-width: 900px;
+  margin: auto;
+  padding: 40px 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  font-size: 42px;
+  color: #4fc3ff;
+}
+
+.header p {
+  opacity: 0.8;
+}
+
+.card {
+  background: rgba(15, 25, 40, 0.85);
+  border: 1px solid rgba(79, 195, 255, 0.2);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 40px rgba(0, 150, 255, 0.15);
+}
+
+.card h2 {
+  margin-bottom: 20px;
+  color: #4fc3ff;
+}
+
+input[type="text"],
+input[type="file"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  background: #0b1624;
+  border: 1px solid #2a3f5f;
+  border-radius: 8px;
+  color: white;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #4fc3ff, #00d4ff);
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #002233;
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+.result {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.result.success {
+  background: rgba(0, 255, 170, 0.12);
+  border: 1px solid #00ffaa;
+  color: #9effe3;
+}
+
+.result.error {
+  background: rgba(255, 60, 60, 0.12);
+  border: 1px solid #ff4d4d;
+  color: #ffb3b3;
+}
+
+footer {
+  text-align: center;
+  margin-top: 40px;
+  opacity: 0.6;
+  font-size: 14px;
+}

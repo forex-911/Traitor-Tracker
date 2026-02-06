@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Traitor Checker | Traitor-Tracer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>Traitor Checker</h2>
+    <p class="subtitle">Upload leaked image to identify the traitor</p>
+
+    <form action="/trace-image" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+
+        <button type="submit">Check Traitor</button>
+    </form>
+
+    {% if result %}
+        <div class="result success">
+            <p><b>Traitor User:</b> {{ result.user }}</p>
+            <p><b>Watermarked At:</b> {{ result.time }}</p>
+        </div>
+    {% elif error %}
+        <div class="result error">
+            {{ error }}
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

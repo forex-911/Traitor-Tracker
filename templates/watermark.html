@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Traitor-Tracer | Image Watermark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>Traitor-Tracer</h2>
+    <p class="subtitle">Upload an image to embed an invisible watermark</p>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="text" name="user_id" placeholder="User ID" required>
+
+        <input type="file" name="image" accept="image/*" required>
+
+        <button type="submit">Upload & Watermark</button>
+    </form>
+</div>
+
+</body>
+</html>
