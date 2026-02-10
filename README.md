@@ -85,7 +85,7 @@ traitor-tracer/
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/forex-911/Traitor-Tracker.git
-cd traitor-tracer
+cd Traitor-Tracker
 ```
 
 ### 2. Create a virtual environment (recommended)
